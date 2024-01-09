@@ -43,9 +43,13 @@ contract SkillTree {
 //        //TODO: fill this
 //    }
 //
-//    function addSkill(string memory _name, uint memory _level) public {
-//        //TODO: fill this
-//    }
+    function addSkill(string memory _name, uint _level) public {
+        require(_level >= 1 && _level <= 5, "Skill level must be between 0 and 5");
+        skills[msg.sender].push(Skill({
+            name: _name,
+            level: _level
+        }));
+    }
 //
 //    function editSkill(uint32 _skillId, Skill _newSkill) public  {
 //        //TODO: fill this
