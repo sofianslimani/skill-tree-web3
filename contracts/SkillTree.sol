@@ -20,7 +20,7 @@ contract SkillTree {
     }
 
     mapping(address => Profile) private profiles;
-    mapping(address => mapping(uint32 => Skill)) private skills;
+    mapping(address => Skill[]) private skills;
     mapping(address => SkillValidation) private skillsValidation;
 
     constructor() {}
@@ -31,9 +31,9 @@ contract SkillTree {
 //        //TODO : fill this
 //    }
 //
-//    function getUserSkills(address _address) public view returns (Skill[] memory) {
-//        //TODO : fill this
-//    }
+    function getUserSkills(address _address) public view returns (Skill[] memory) {
+        return skills[_address];
+    }
 //
 //    function getUser(address _address) public view returns (Profile memory) {
 //        // TODO: fill this

@@ -6,16 +6,27 @@ describe("SkillTree", function () {
         const [owner, otherAccount] = await ethers.getSigners();
 
         const SkillTree = await ethers.getContractFactory("SkillTree");
-        const lock = await SkillTree.deploy();
+        const skillTree = await SkillTree.deploy();
 
-        return {lock, owner, otherAccount};
+        return {skillTree, owner, otherAccount};
     }
 
     describe("Deployment", function () {
         it("Should deploy without failing", async function () {
-            const {lock, owner} = await deploySkillTree();
-            expect(lock).to.not.equal(undefined);
+            const {skillTree} = await deploySkillTree();
+            expect(skillTree).to.not.equal(undefined);
         });
+
     });
+
+    describe("Skills", function () {
+        it("Should list the users skills", async function () {
+            const {skillTree, owner} = await deploySkillTree();
+           const skills = await skillTree.getUserSkills(owner.address)
+            expect(skills).to.eql([]);
+        });
+        })
+    });
+
 
 });
