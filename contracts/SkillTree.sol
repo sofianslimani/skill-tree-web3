@@ -1,39 +1,74 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+    // SPDX-License-Identifier: UNLICENSED
+    pragma solidity ^0.8.9;
 
 
-contract SkillTree {
-    struct Skill {
-        string name;
-        uint level;
-    }
+    contract SkillTree {
+        struct Skill {
+            string name;
+            uint level;
+        }
 
-    struct Profile {
-        string lastName;
-        string firstName;
-        //address walletAddress;
-    }
+        struct Profile {
+            string lastName;
+            string firstName;
+            //address walletAddress;
+        }
 
-    struct SkillValidation {
-        address validator;
-        uint32 skillId;
-    }
+        struct SkillValidation {
+            address validator;
+            uint32 skillId;
+        }
 
     mapping(address => Profile) private profiles;
     mapping(address => Skill[]) private skills;
     mapping(address => SkillValidation[]) private skillsValidation;
 
-    constructor() {}
+        constructor() {}
 
 
-//
-//    function listUsers() public view returns (Profile[] memory) {
-//        //TODO : fill this
-//    }
-//
     function getUserSkills(address _address) public view returns (Skill[] memory) {
         return skills[_address];
     }
+        address[] private userAddresses;
+
+        function addUser(address _userAddress, string memory _firstName, string memory _lastName) public {
+            // Ajouter le profil
+            profiles[_userAddress] = Profile(_lastName, _firstName);
+
+            // Ajouter l'adresse à la liste des adresses
+            userAddresses.push(_userAddress);
+        }
+
+        function listUsers() public view returns (address[] memory) {
+            uint count = 0;
+
+            // Count how many users are not the caller
+            for (uint i = 0; i < userAddresses.length; i++) {
+                if (userAddresses[i] != msg.sender) {
+                    count++;
+                }
+            }
+
+            address[] memory nonCallerUsers = new address[](count);
+            uint j = 0;
+
+            // Populate the array with users that are not the caller
+            for (uint i = 0; i < userAddresses.length; i++) {
+                if (userAddresses[i] != msg.sender) {
+                    nonCallerUsers[j] = userAddresses[i];
+                    j++;
+                }
+            }
+
+            return nonCallerUsers;
+        }
+
+
+
+        //
+//    function getUserSkills(address _address) public view returns (Skill[] memory) {
+//        //TODO : fill this
+//    }
 //
 //    function getUser(address _address) public view returns (Profile memory) {
 //        // TODO: fill this

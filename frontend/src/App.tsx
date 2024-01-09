@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage/HomePage";
-import ProfilPage from "./pages/ProfilPage/ProfilPage";
+import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import Loader from "./components/Loader/Loader";
 
 export interface MetamaskContextType {
@@ -42,7 +42,7 @@ function App(): JSX.Element {
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/profil" element={<ProfilPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </Router>
     </MetamaskContext.Provider>
