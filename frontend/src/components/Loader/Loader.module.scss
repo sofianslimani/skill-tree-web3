@@ -1,0 +1,16 @@
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+  height: 100vh;
+  width: 100vw;
+  background-color: #292929;
+  color: #ff6700;
+
+  svg path,
+  svg rect {
+    fill: #ff6700;
+  }
+}
