@@ -26,36 +26,36 @@ contract SkillTree {
     constructor() {}
 
 
-
-    function listUsers() public view returns (Profile[] memory) {
-        //TODO : fill this
-    }
-
-    function getUserSkills(address _address) public view returns (Skill[] memory) {
-        //TODO : fill this
-    }
-
-    function getUser(address _address) public view returns (Profile memory) {
-        // TODO: fill this
-    }
-
-    function editProfile(string memory _lastName, string memory _firstName) public {
-        //TODO: fill this
-    }
-
-    function getUser(address _address) public view returns (Profile memory) {
-        // TODO: fill this
-    }
-
-    function addSkill(string memory _name, uint memory _level) public {
-        //TODO: fill this
-    }
-
-    function editSkill(uint32 _skillId, Skill _newSkill) public  {
-        //TODO: fill this
-    }
-
-    function deleteSkill(uint32 _skillId) public  {
-        //TODO: fill this
-    }
+//
+//    function listUsers() public view returns (Profile[] memory) {
+//        //TODO : fill this
+//    }
+//
+//    function getUserSkills(address _address) public view returns (Skill[] memory) {
+//        //TODO : fill this
+//    }
+//
+//    function getUser(address _address) public view returns (Profile memory) {
+//        // TODO: fill this
+//    }
+//
+//    function editProfile(string memory _lastName, string memory _firstName) public {
+//        //TODO: fill this
+//    }
+//
+//    function addSkill(string memory _name, uint memory _level) public {
+//        //TODO: fill this
+//    }
+//
+//    function editSkill(uint32 _skillId, Skill _newSkill) public  {
+//        //TODO: fill this
+//    }
+//
+//    function deleteSkill(uint32 _skillId) public  {
+//        //TODO: fill this
+//    }
+//
+//    function addSkillValidation(address _userAddress, uint32 _skillId) public  {
+//        //TODO: fill this
+//    }
 }
