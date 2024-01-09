@@ -20,8 +20,8 @@ contract SkillTree {
     }
 
     mapping(address => Profile) private profiles;
-    mapping(address => mapping(uint32 => Skill)) private skills;
-    mapping(address => SkillValidation) private skillsValidation;
+    mapping(address => Skill[]) private skills;
+    mapping(address => SkillValidation[]) private skillsValidation;
 
     constructor() {}
 
@@ -31,9 +31,9 @@ contract SkillTree {
 //        //TODO : fill this
 //    }
 //
-//    function getUserSkills(address _address) public view returns (Skill[] memory) {
-//        //TODO : fill this
-//    }
+    function getUserSkills(address _address) public view returns (Skill[] memory) {
+        return skills[_address];
+    }
 //
 //    function getUser(address _address) public view returns (Profile memory) {
 //        // TODO: fill this
@@ -43,9 +43,13 @@ contract SkillTree {
 //        //TODO: fill this
 //    }
 //
-//    function addSkill(string memory _name, uint memory _level) public {
-//        //TODO: fill this
-//    }
+    function addSkill(string memory _name, uint _level) public {
+        require(_level >= 1 && _level <= 5, "Skill level must be between 1 and 5");
+        skills[msg.sender].push(Skill({
+            name: _name,
+            level: _level
+        }));
+    }
 //
 //    function editSkill(uint32 _skillId, Skill _newSkill) public  {
 //        //TODO: fill this
