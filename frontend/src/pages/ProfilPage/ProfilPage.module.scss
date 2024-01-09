@@ -1,0 +1,11 @@
+.profilPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+
+  .title {
+    color: #333;
+    margin-bottom: 20px;
+  }
+}
