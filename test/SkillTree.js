@@ -31,13 +31,16 @@ describe("SkillTree", function () {
             const skills = await skillTree.getUserSkills(owner.address)
             expect(skills).to.eql([['javascript', BigInt(3)]]);
         });
-        it('should fail if the skill level is <0 or >5', async function () {
+        it('should fail to add a skill if the skill level is <0 or >5', async function () {
             const {skillTree, owner} = await deploySkillTree();
             async function addSkill(skill, level) {
                 return await skillTree.addSkill(skill, level);
             }
             await expect(addSkill('javascript', -1)).to.be.rejected;
-            await expect(addSkill('javascript', 6)).to.be.revertedWith('Skill level must be between 0 and 5');
+            await expect(addSkill('javascript', 0)).to.be.revertedWith('Skill level must be between 1 and 5');
+            await expect(addSkill('javascript', 6)).to.be.revertedWith('Skill level must be between 1 and 5');
+            const skills = await skillTree.getUserSkills(owner.address)
+            expect(skills).to.eql([]);
         })
     });
 

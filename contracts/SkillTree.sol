@@ -21,7 +21,7 @@ contract SkillTree {
 
     mapping(address => Profile) private profiles;
     mapping(address => Skill[]) private skills;
-    mapping(address => SkillValidation) private skillsValidation;
+    mapping(address => SkillValidation[]) private skillsValidation;
 
     constructor() {}
 
@@ -44,7 +44,7 @@ contract SkillTree {
 //    }
 //
     function addSkill(string memory _name, uint _level) public {
-        require(_level >= 1 && _level <= 5, "Skill level must be between 0 and 5");
+        require(_level >= 1 && _level <= 5, "Skill level must be between 1 and 5");
         skills[msg.sender].push(Skill({
             name: _name,
             level: _level
