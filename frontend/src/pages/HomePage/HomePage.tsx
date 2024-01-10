@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import styles from "./HomePage.module.scss";
 import { MetamaskContext } from "../../App";
 import { Link } from "react-router-dom";
@@ -14,6 +14,17 @@ const fakeUsers = [
 
 const HomePage = () => {
   const metamaskContext: MetamaskContextType = useContext(MetamaskContext)!;
+  const [users, setUsers] = useState([]);
+
+  const getUsers = async () => {
+    const users = await metamaskContext.contract.listUsers();
+    console.log((users as any)[0]);
+    setUsers(users as any);
+  };
+
+  useEffect(() => {
+    getUsers();
+  }, []);
 
   console.log(metamaskContext);
   return (
