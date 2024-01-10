@@ -7,7 +7,7 @@ describe("SkillTree", function () {
 
         const SkillTree = await ethers.getContractFactory("SkillTree");
         const skillTree = await SkillTree.deploy();
-
+        await skillTree.waitForDeployment();
         return {skillTree, owner, otherAccount};
     }
 
@@ -29,7 +29,7 @@ describe("SkillTree", function () {
             const {skillTree, owner} = await deploySkillTree();
             await skillTree.addSkill('javascript', 3);
             const skills = await skillTree.getUserSkills(owner.address)
-            expect(skills).to.eql([['javascript', BigInt(3)]]);
+            expect(skills).to.eql([['javascript', BigInt(3), []]]);
         });
         it('should fail to add a skill if the skill level is <0 or >5', async function () {
             const {skillTree, owner} = await deploySkillTree();
@@ -44,5 +44,38 @@ describe("SkillTree", function () {
         })
     });
 
+    describe('SkillValidation', function () {
+      it('should validate a skill', async function () {
+            const {skillTree, owner, otherAccount} = await deploySkillTree();
+            await skillTree.connect(owner).addSkill('javascript', 3);
+            await skillTree.connect(otherAccount).addSkillValidation(owner.address, 0);
+            const skills = await skillTree.getUserSkills(owner.address)
+            expect(skills).to.eql([['javascript', BigInt(3), [[otherAccount.address, BigInt(0)]]]]);
+      })
+        it('should only return the validation for the corresponding skill', async function () {
+            const {skillTree, owner, otherAccount} = await deploySkillTree();
+            await skillTree.connect(owner).addSkill('javascript', 3);
+            await skillTree.connect(owner).addSkill('javascript', 4);
+            await skillTree.connect(otherAccount).addSkillValidation(owner.address, 0);
+            await skillTree.connect(otherAccount).addSkillValidation(owner.address, 1);
+            const skills = await skillTree.getUserSkills(owner.address)
+            expect(skills).to.eql([
+                ['javascript', BigInt(3), [[otherAccount.address, BigInt(0)]]],
+                ['javascript', BigInt(4), [[otherAccount.address, BigInt(1)]]]
+            ]);
+        })
+        it('should fail to validate a skill if the skill does not exist', async function () {
+            const {skillTree, owner, otherAccount} = await deploySkillTree();
+            await expect(skillTree.connect(otherAccount).addSkillValidation(owner.address, 0)).to.be.revertedWith('Skill does not exist');
+        })
+        it('should fail to validate a skill if the user try to validate his own skills', async function () {
+            const {skillTree, owner, otherAccount} = await deploySkillTree();
+            await skillTree.addSkill('javascript', 3);
+            async function addSkillValidation() {
+                return await skillTree.addSkillValidation(owner.address, 0);
+            }
+            expect(addSkillValidation()).to.be.revertedWith('You cannot validate your own skills');
+        })
+    })
 
 });
