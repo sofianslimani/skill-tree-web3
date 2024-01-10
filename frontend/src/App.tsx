@@ -31,6 +31,10 @@ function App(): JSX.Element {
         signer
       )) as SkillTreeContract;
 
+      console.log(accounts);
+
+      await contract.addUser(accounts[1], "UserOne", "Développeur Frontend");
+
       setContext({
         account: accounts[0],
         contract,
