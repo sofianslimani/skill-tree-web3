@@ -1,0 +1,208 @@
+$primary-color: #0073b1;
+$background-color: #f8f8f8;
+$text-color: #333333;
+$border-color: #dce0e0;
+$skill-background: #ffffff;
+$skill-hover: #e1ecf4;
+$shadow-color: rgba(0, 0, 0, 0.1);
+
+.profilePage {
+  background-color: #fff;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  font-family: Arial, sans-serif;
+  margin: 50px auto;
+  max-width: 900px;
+  padding: 2rem;
+
+  .profileHeader {
+    border-bottom: 1px solid $border-color;
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+
+    .username {
+      color: $primary-color;
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .bio {
+      color: $text-color;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  .profileSkills {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+
+    .skillItem {
+      background-color: $skill-background;
+      border: 1px solid $border-color;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 4px $shadow-color;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px $shadow-color;
+      }
+
+      span {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .validators {
+        font-size: 0.8rem;
+        color: $text-color;
+        margin-top: 10px;
+      }
+
+      button {
+        background-color: $primary-color;
+        border: none;
+        border-radius: 20px;
+        color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+        padding: 5px 10px;
+        margin-top: 10px;
+        text-transform: uppercase;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: darken($primary-color, 10%);
+        }
+      }
+    }
+  }
+
+  .profileForm {
+    background-color: $skill-background;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px $shadow-color;
+    margin-top: 20px;
+    padding: 20px;
+
+    .formField,
+    .skills-list {
+      margin-bottom: 20px;
+
+      label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: $text-color;
+      }
+
+      input[type="text"],
+      textarea {
+        width: calc(100% - 100px);
+        padding: 10px;
+        border: 1px solid $border-color;
+        border-radius: 5px;
+        font-size: 1rem;
+        color: $text-color;
+        display: inline-block;
+        margin-right: 10px;
+
+        &:focus {
+          border-color: $primary-color;
+          outline: none;
+          box-shadow: 0 0 5px rgba($primary-color, 0.5);
+        }
+      }
+
+      button {
+        margin-top: 10px;
+
+        background-color: $primary-color;
+        border: none;
+        border-radius: 20px;
+        color: white;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 10px 20px;
+        text-transform: uppercase;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: darken($primary-color, 10%);
+        }
+      }
+    }
+
+    .skillItem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: $skill-background;
+      border: 1px solid $border-color;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+
+      button {
+        margin-left: 10px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+
+        &:hover {
+          color: red;
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .formActions {
+      display: flex;
+      justify-content: space-between;
+
+      button {
+        width: 48%;
+        margin-top: 10px;
+        background-color: $primary-color;
+        border: none;
+        border-radius: 20px;
+        color: white;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+        text-transform: uppercase;
+        transition: background-color 0.3s;
+        &:hover {
+          background-color: darken($primary-color, 10%);
+        }
+      }
+    }
+  }
+  .editButton {
+    margin-top: 30px;
+    background-color: $primary-color;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    text-transform: uppercase;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
+  }
+}
