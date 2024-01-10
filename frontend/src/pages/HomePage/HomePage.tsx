@@ -12,31 +12,55 @@ const fakeUsers = [
   { id: 5, username: "UserTwo", profession: "Concepteur UX" },
 ];
 
+interface User {
+  lastName: string;
+  firstname: string;
+  skills: string[];
+}
+
 const HomePage = () => {
   const metamaskContext: MetamaskContextType = useContext(MetamaskContext)!;
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
+
+  const mapUsersProfiles = (users: any) => {
+    let tmp = JSON.parse(JSON.stringify(users));
+
+    return tmp.map((user: any) => {
+      return {
+        lastName: user[0],
+        firstname: user[1],
+        skills: user[2],
+      };
+    });
+  };
 
   const getUsers = async () => {
-    const users = await metamaskContext.contract.listUsers();
-    console.log((users as any)[0]);
-    setUsers(users as any);
+    return mapUsersProfiles(await metamaskContext.contract.listProfiles());
   };
 
   useEffect(() => {
-    getUsers();
+    getUsers().then((users) => {
+      setUsers(users);
+    });
   }, []);
 
-  console.log(metamaskContext);
   return (
     <div className={styles.homePage}>
       <h1>Liste des Utilisateurs</h1>
       <ul className={styles.userList}>
-        {fakeUsers.map((user) => (
-          <li key={user.id} className={styles.userItem}>
-            <Link to={`/profile/${user.id}`} className={styles.userLink}>
-              {user.username}
+        {users.map((user, i) => (
+          <li key={i} className={styles.userItem}>
+            <Link to={`/profile/${i}`} className={styles.userLink}>
+              {user.firstname} {user.lastName}
             </Link>
-            <div className={styles.profession}>{user.profession}</div>
+            <div className={styles.profession}>
+              {user.skills.map((skill, i) => (
+                <>
+                  {i > 0 ? ", " : ""}
+                  {skill}
+                </>
+              ))}
+            </div>
           </li>
         ))}
       </ul>
