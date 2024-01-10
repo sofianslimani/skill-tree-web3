@@ -9,12 +9,11 @@ const initialProfileData = {
     {
       name: "React",
       rating: 3,
-      validatedCount: 0,
-      validators: ["User1", "User2"],
+      validators: ["User1", "User2", "User2", "User2", "User2", "User2"],
     },
-    { name: "JavaScript", rating: 4, validatedCount: 0, validators: [] },
-    { name: "SASS", rating: 5, validatedCount: 0, validators: ["User3"] },
-    { name: "UI/UX Design", rating: 3, validatedCount: 0, validators: [] },
+    { name: "JavaScript", rating: 4, validators: [] },
+    { name: "SASS", rating: 5, validators: ["User3"] },
+    { name: "UI/UX Design", rating: 3, validators: [] },
   ],
 };
 
@@ -49,7 +48,7 @@ const ProfilePage = ({ isOwnProfile = true }) => {
         ...profileData,
         skills: [
           ...profileData.skills,
-          { name: newSkill, rating: 0, validatedCount: 0, validators: [] },
+          { name: newSkill, rating: 0, validators: [] },
         ],
       });
       setNewSkill("");
@@ -78,15 +77,31 @@ const ProfilePage = ({ isOwnProfile = true }) => {
   const handleSkillValidation = (skillName) => {
     const updatedSkills = profileData.skills.map((skill) => {
       if (skill.name === skillName) {
-        return {
-          ...skill,
-          validatedCount: skill.validatedCount + 1,
-          validators: [...skill.validators, "CurrentUser"],
-        }; // Replace "CurrentUser" with actual user name
+        if (skill.validators.includes("CurrentUser")) {
+          return {
+            ...skill,
+            validators: skill.validators.filter((v) => v !== "CurrentUser"),
+          };
+        } else {
+          return {
+            ...skill,
+            validators: [...skill.validators, "CurrentUser"],
+          };
+        }
       }
       return skill;
     });
     setProfileData({ ...profileData, skills: updatedSkills });
+  };
+
+  const renderValidators = (validators) => {
+    if (validators.length <= 4) {
+      return validators.join(", ");
+    } else {
+      return `${validators.slice(0, 4).join(", ")} et ${
+        validators.length - 4
+      } autres`;
+    }
   };
 
   return (
@@ -106,21 +121,24 @@ const ProfilePage = ({ isOwnProfile = true }) => {
                 handleSkillRatingChange(skill.name, newRating)
               }
             />
-            {!isEditing && (
-              <>
-                {!isOwnProfile && (
-                  <button onClick={() => handleSkillValidation(skill.name)}>
-                    Valider ({skill.validatedCount})
-                  </button>
-                )}
-                {skill.validators?.length !== 0 && (
-                  <div>Validée {skill.validators.length} fois</div>
-                )}
-                <div className={styles.validators}>
-                  {skill.validators.join(", ")}
-                </div>
-              </>
+            {!isEditing && !isOwnProfile && (
+              <button onClick={() => handleSkillValidation(skill.name)}>
+                {skill.validators.includes("CurrentUser")
+                  ? "Annuler"
+                  : "Valider"}
+              </button>
             )}
+            {skill.validators && skill.validators.length > 0 && (
+              <div className={styles.validationsCount}>
+                {skill.validators.length}
+                {skill.validators.length > 1
+                  ? " recommandations"
+                  : " recommandation"}
+              </div>
+            )}
+            <div className={styles.validators}>
+              {renderValidators(skill.validators)}
+            </div>
           </div>
         ))}
       </div>
@@ -171,10 +189,10 @@ const ProfilePage = ({ isOwnProfile = true }) => {
             </div>
           ))}
           <div className={styles.formActions}>
+            <button type="submit">Enregistrer les modifications</button>
             <button type="button" onClick={handleCancelClick}>
               Annuler
             </button>
-            <button type="submit">Enregistrer les modifications</button>
           </div>
         </form>
       ) : (

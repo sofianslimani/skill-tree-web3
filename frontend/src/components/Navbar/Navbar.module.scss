@@ -1,0 +1,31 @@
+$navbar-background-color: #fff;
+$navbar-text-color: #333;
+$navbar-text-hover-color: #0073b1;
+$navbar-border-color: #dce0e0;
+
+.navbar {
+  background-color: $navbar-background-color;
+  border-bottom: 1px solid $navbar-border-color;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  .navContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .navLink {
+    color: $navbar-text-color;
+    text-decoration: none;
+    padding: 10px 15px;
+    font-weight: bold;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: $navbar-text-hover-color;
+    }
+  }
+}

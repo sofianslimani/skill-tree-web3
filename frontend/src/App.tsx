@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage/HomePage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
+import Navbar from "./components/Navbar/Navbar";
 import Loader from "./components/Loader/Loader";
 
 export interface MetamaskContextType {
@@ -40,6 +41,7 @@ function App(): JSX.Element {
   return (
     <MetamaskContext.Provider value={context}>
       <Router>
+        <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
