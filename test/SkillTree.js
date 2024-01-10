@@ -64,6 +64,39 @@ describe("SkillTree", function () {
             const skills = await skillTree.getUserSkills(owner.address);
             expect(skills).to.eql([]);
         });
+
+        it('should delete the skill and theses validation if it exist', async function () {
+            const { skillTree, owner } = await deploySkillTree();
+            await skillTree.addSkill('javascript', 3);
+            await skillTree.deleteSkill(0);
+            const skills = await skillTree.getUserSkills(owner.address);
+            expect(skills).to.eql([]);
+            const skillValidations = await skillTree.getUserSkillValidations(owner.address);
+            expect(skillValidations).to.eql([]);
+        })
+
+        it('should fail to delete a skill if the skill does not exist', async function () {
+            const { skillTree, owner } = await deploySkillTree();
+            async function deleteSkill() {
+                return await skillTree.deleteSkill(0);
+            }
+            await expect(deleteSkill()).to.be.revertedWith('Skill does not exist');
+        })
+        it("should edit a skill", async function () {
+            const { skillTree, owner } = await deploySkillTree();
+            await skillTree.addSkill('javascript', 3);
+            await skillTree.editSkill(0, 'javascript', 4);
+            const skills = await skillTree.getUserSkills(owner.address)
+            expect(skills).to.eql([['javascript', BigInt(4), []]]);
+        })
+
+        it('should fail to edit a skill if the skill does not exist', async function () {
+            const { skillTree, owner } = await deploySkillTree();
+            async function editSkill() {
+                return await skillTree.editSkill(0, 'javascript', 4);
+            }
+            await expect(editSkill()).to.be.revertedWith('Skill does not exist');
+        })
     });
 
 
