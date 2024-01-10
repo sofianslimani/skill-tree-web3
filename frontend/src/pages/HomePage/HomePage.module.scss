@@ -1,11 +1,67 @@
-.homePage {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
+$primary-color: #0073b1;
+$text-color: #333333;
+$border-color: #dce0e0;
+$background-color: #f8f8f8;
+$list-hover-color: #eef3f8;
 
-  .title {
-    color: #333;
-    margin-bottom: 20px;
+.homePage {
+  font-family: Arial, sans-serif;
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: $background-color;
+  border-radius: 8px;
+
+  h1 {
+    color: $primary-color;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .userList {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+
+    .userItem {
+      border-bottom: 1px solid $border-color;
+      padding: 15px;
+      transition: background-color 0.2s ease-in-out;
+      position: relative;
+
+      &:hover {
+        background-color: $list-hover-color;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .userLink {
+        color: $text-color;
+        text-decoration: none;
+        font-size: 1.2rem;
+        font-weight: bold;
+
+        &:hover {
+          color: $primary-color;
+        }
+
+        &::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+        }
+      }
+
+      .profession {
+        color: $text-color;
+        font-size: 0.9rem;
+        margin-top: 5px;
+      }
+    }
   }
 }
