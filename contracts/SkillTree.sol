@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 
 import "hardhat/console.sol";
 
+
 contract SkillTree {
     struct Skill {
         string name;
@@ -75,6 +76,8 @@ contract SkillTree {
         return userSkillsValidationDto;
     }
 
+    address[] private userAddresses;
+
     function filterSkillValidation(address _address, uint32 _skillId) private view returns (SkillValidation[] memory) {
         SkillValidation[] memory userSkillsValidation = skillsValidation[_address];
         uint resultCount = 0;
@@ -131,13 +134,20 @@ contract SkillTree {
     }
 
     //
+//        function getUserSkills(address _address) public view returns (Skill[] memory) {
+//            //TODO : fill this
+//        }
+    //
 //    function getUserSkills(address _address) public view returns (Skill[] memory) {
 //        //TODO : fill this
 //    }
 //
-//    function getUser(address _address) public view returns (Profile memory) {
-//        // TODO: fill this
-//    }
+    function getUser(address _address) public view returns (Profile memory) {
+        Profile memory profile = profiles[_address];
+        require(bytes(profile.lastName).length > 0 || bytes(profile.firstName).length > 0, "User does not exist");
+        console.log(profile.lastName);
+        return profile;
+    }
 //
 //    function editProfile(string memory _lastName, string memory _firstName) public {
 //        //TODO: fill this

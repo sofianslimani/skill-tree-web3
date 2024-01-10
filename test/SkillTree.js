@@ -37,6 +37,15 @@ describe("SkillTree", function () {
             expect(users).to.include(user2.address);
             expect(users.length).to.equal(2);
         });
+        it('should handle existing and non-existing users correctly', async () => {
+            const { skillTree, user1 } = await deploySkillTree();
+            const nonExistentAddress = '0x0000000000000000000000000000000000000000';
+            async function getUser(address) {
+                await skillTree.getUser(address)
+            }
+            expect(getUser(nonExistentAddress)).to.be.rejectedWith('User does not exist');
+        });
+
     });
 
     describe("Skills", function () {
@@ -153,3 +162,4 @@ describe("SkillTree", function () {
 
     })
 });
+
