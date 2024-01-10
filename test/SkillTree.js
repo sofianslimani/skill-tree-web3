@@ -18,6 +18,7 @@ function transformSkills(skills) {
 
 function transformProfile(profile) {
     return {
+        userAddress: profile.userAddress,
         lastName: profile.lastName,
         firstName: profile.firstName,
         skills: transformSkills(profile.skills)
@@ -68,8 +69,8 @@ describe("SkillTree", function () {
             const listProfiles = await skillTree.listProfiles();
             const transformedProfiles = listProfiles.map(transformProfile);
             expect(transformedProfiles).to.eql([
-                {lastName: "User1LastName", firstName: "User1FirstName", skills: []},
-                {lastName: "User2LastName", firstName: "User2FirstName", skills: []}
+                {lastName: "User1LastName", firstName: "User1FirstName", skills: [], userAddress: user1.address},
+                {lastName: "User2LastName", firstName: "User2FirstName", skills: [], userAddress: user2.address}
             ]);
         })
 
@@ -78,7 +79,7 @@ describe("SkillTree", function () {
             await skillTree.addUser(user1.address, "User1FirstName", "User1LastName");
             const userProfile = await skillTree.getProfile(user1.address);
             const transformedProfile = transformProfile(userProfile);
-            expect(transformedProfile).to.eql({lastName: "User1LastName", firstName: "User1FirstName", skills: []});
+            expect(transformedProfile).to.eql({lastName: "User1LastName", firstName: "User1FirstName", skills: [], userAddress: user1.address});
         })
 
         it('should handle existing and non-existing users correctly', async () => {
@@ -96,7 +97,7 @@ describe("SkillTree", function () {
             await skillTree.editProfile("LastName", "FirstName");
             const userProfile = await skillTree.getProfile(owner.address);
             const transformedProfile = transformProfile(userProfile);
-            expect(transformedProfile).to.eql({lastName: "LastName", firstName: "FirstName", skills: []});
+            expect(transformedProfile).to.eql({lastName: "LastName", firstName: "FirstName", skills: [], userAddress: owner.address});
         })
     });
 

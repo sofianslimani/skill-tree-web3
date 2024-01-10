@@ -33,6 +33,7 @@ contract SkillTree {
     }
 
     struct ProfileDto {
+        address userAddress;
         string lastName;
         string firstName;
         SkillDto[] skills;
@@ -168,6 +169,7 @@ contract SkillTree {
         for (uint i = 0; i < users.length; i++) {
             Profile memory profile = profiles[users[i]];
             profilesDto[i] = ProfileDto(
+                users[i],
                 profile.lastName,
                 profile.firstName,
                 getUserSkills(users[i])
@@ -180,6 +182,7 @@ contract SkillTree {
         Profile memory profile = profiles[_address];
         require(bytes(profile.lastName).length > 0 || bytes(profile.firstName).length > 0, "User does not exist");
         return ProfileDto(
+            _address,
             profile.lastName,
             profile.firstName,
             getUserSkills(_address)
