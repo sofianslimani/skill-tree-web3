@@ -1,6 +1,7 @@
     // SPDX-License-Identifier: UNLICENSED
     pragma solidity ^0.8.9;
 
+import "hardhat/console.sol";
 
     contract SkillTree {
         struct Skill {
@@ -19,16 +20,48 @@
             uint32 skillId;
         }
 
+    struct SkillDto {
+        string name;
+        uint level;
+        SkillValidation[] validations;
+    }
+
     mapping(address => Profile) private profiles;
     mapping(address => Skill[]) private skills;
     mapping(address => SkillValidation[]) private skillsValidation;
 
         constructor() {}
 
-
-    function getUserSkills(address _address) public view returns (Skill[] memory) {
-        return skills[_address];
-    }
+    function getUserSkills(address _address) public view returns (SkillDto[] memory) {
+        SkillValidation[] memory userSkillsValidation = skillsValidation[_address];
+        SkillDto[] memory userSkills = new SkillDto[](skills[_address].length);
+        for (uint i = 0; i < skills[_address].length; i++) {
+            Skill memory skill = skills[_address][i];
+            uint  resultCount = 0;
+            for (uint j = 0; j < userSkillsValidation.length; j++) {
+                SkillValidation memory skillValidation = userSkillsValidation[j];
+                if (skillValidation.skillId == i) {
+                    resultCount++;
+                }
+            }
+            SkillValidation[] memory skillValidations = new SkillValidation[](resultCount);
+            uint resultIndex = 0;
+            for (uint j = 0; j < userSkillsValidation.length; j++) {
+                SkillValidation memory skillValidation = userSkillsValidation[j];
+                if (skillValidation.skillId == i) {
+                    skillValidations[resultIndex] = skillValidation;
+                    resultIndex++;
+                }
+            }
+            userSkills[i] = SkillDto({
+                name: skill.name,
+                level: skill.level,
+                validations: skillValidations
+            });
+        }
+        return userSkills;
+        }
+        
         address[] private userAddresses;
 
         function addUser(address _userAddress, string memory _firstName, string memory _lastName) public {
@@ -94,7 +127,13 @@
 //        //TODO: fill this
 //    }
 //
-//    function addSkillValidation(address _userAddress, uint32 _skillId) public  {
-//        //TODO: fill this
-//    }
+    function addSkillValidation(address _userAddress, uint32 _skillId) public {
+        require(msg.sender != _userAddress, "You cannot validate your own skills");
+        require(_skillId < skills[_userAddress].length, "Skill does not exist");
+        skillsValidation[_userAddress].push(SkillValidation({
+            validator: msg.sender,
+            skillId: _skillId
+        }));
+    }
+
 }
