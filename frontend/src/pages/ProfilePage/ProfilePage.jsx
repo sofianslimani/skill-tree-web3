@@ -1,14 +1,24 @@
 import React, { useState } from "react";
 import styles from "./ProfilePage.module.scss";
-import { FaCode, FaPaintBrush, FaCog } from "react-icons/fa";
+import Rating from "react-rating";
 
 const initialProfileData = {
   username: "Jane Doe",
   bio: "Développeuse Frontend | Spécialiste React & SASS | Passionnée par l'UI/UX",
-  skills: ["React", "JavaScript", "SASS", "UI/UX Design"],
+  skills: [
+    {
+      name: "React",
+      rating: 3,
+      validatedCount: 0,
+      validators: ["User1", "User2"],
+    },
+    { name: "JavaScript", rating: 4, validatedCount: 0, validators: [] },
+    { name: "SASS", rating: 5, validatedCount: 0, validators: ["User3"] },
+    { name: "UI/UX Design", rating: 3, validatedCount: 0, validators: [] },
+  ],
 };
 
-const ProfilePage = () => {
+const ProfilePage = ({ isOwnProfile = true }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState(initialProfileData);
   const [newSkill, setNewSkill] = useState("");
@@ -21,32 +31,64 @@ const ProfilePage = () => {
     setIsEditing(false);
   };
 
-  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (event) => {
     event.preventDefault();
-    // Logique de mise à jour des données
     setIsEditing(false);
   };
 
-  const handleSkillChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSkillChange = (event) => {
     setNewSkill(event.target.value);
   };
 
   const handleAddSkill = () => {
-    if (newSkill && !profileData.skills.includes(newSkill)) {
+    if (
+      newSkill &&
+      !profileData.skills.find((skill) => skill.name === newSkill)
+    ) {
       setProfileData({
         ...profileData,
-        skills: [...profileData.skills, newSkill],
+        skills: [
+          ...profileData.skills,
+          { name: newSkill, rating: 0, validatedCount: 0, validators: [] },
+        ],
       });
       setNewSkill("");
     }
   };
 
-  const handleRemoveSkill = (skillToRemove: string) => {
+  const handleRemoveSkill = (skillToRemove) => {
     setProfileData({
       ...profileData,
-      skills: profileData.skills.filter((skill) => skill !== skillToRemove),
+      skills: profileData.skills.filter(
+        (skill) => skill.name !== skillToRemove
+      ),
     });
   };
+
+  const handleSkillRatingChange = (skillName, newRating) => {
+    const updatedSkills = profileData.skills.map((skill) => {
+      if (skill.name === skillName) {
+        return { ...skill, rating: newRating };
+      }
+      return skill;
+    });
+    setProfileData({ ...profileData, skills: updatedSkills });
+  };
+
+  const handleSkillValidation = (skillName) => {
+    const updatedSkills = profileData.skills.map((skill) => {
+      if (skill.name === skillName) {
+        return {
+          ...skill,
+          validatedCount: skill.validatedCount + 1,
+          validators: [...skill.validators, "CurrentUser"],
+        }; // Replace "CurrentUser" with actual user name
+      }
+      return skill;
+    });
+    setProfileData({ ...profileData, skills: updatedSkills });
+  };
+
   return (
     <div className={styles.profilePage}>
       <div className={styles.profileHeader}>
@@ -54,9 +96,31 @@ const ProfilePage = () => {
         <p className={styles.bio}>{profileData.bio}</p>
       </div>
       <div className={styles.profileSkills}>
-        {profileData.skills.map((skill) => (
-          <div key={skill} className={styles.skill}>
-            <span>{skill}</span>
+        {profileData.skills.map((skill, index) => (
+          <div key={index} className={styles.skillItem}>
+            <span>{skill.name}</span>
+            <Rating
+              initialRating={skill.rating}
+              readonly={!isEditing}
+              onChange={(newRating) =>
+                handleSkillRatingChange(skill.name, newRating)
+              }
+            />
+            {!isEditing && (
+              <>
+                {!isOwnProfile && (
+                  <button onClick={() => handleSkillValidation(skill.name)}>
+                    Valider ({skill.validatedCount})
+                  </button>
+                )}
+                {skill.validators?.length !== 0 && (
+                  <div>Validée {skill.validators.length} fois</div>
+                )}
+                <div className={styles.validators}>
+                  {skill.validators.join(", ")}
+                </div>
+              </>
+            )}
           </div>
         ))}
       </div>
@@ -97,17 +161,20 @@ const ProfilePage = () => {
           </div>
           {profileData.skills.map((skill, index) => (
             <div key={index} className={styles.skillItem}>
-              {skill}
-              <button type="button" onClick={() => handleRemoveSkill(skill)}>
+              {skill.name}
+              <button
+                type="button"
+                onClick={() => handleRemoveSkill(skill.name)}
+              >
                 Retirer
               </button>
             </div>
           ))}
           <div className={styles.formActions}>
-            <button type="submit">Enregistrer les modifications</button>
             <button type="button" onClick={handleCancelClick}>
               Annuler
             </button>
+            <button type="submit">Enregistrer les modifications</button>
           </div>
         </form>
       ) : (
