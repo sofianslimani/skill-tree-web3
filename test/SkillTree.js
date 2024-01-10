@@ -88,8 +88,8 @@ describe("SkillTree", function () {
             ]);
         })
         it('should fail to validate a skill if the skill does not exist', async function () {
-            const {skillTree, owner, otherAccount} = await deploySkillTree();
-            await expect(skillTree.connect(otherAccount).addSkillValidation(owner.address, 0)).to.be.revertedWith('Skill does not exist');
+            const {skillTree, owner, user1} = await deploySkillTree();
+            await expect(skillTree.connect(user1).addSkillValidation(owner.address, 0)).to.be.revertedWith('Skill does not exist');
         })
         it('should fail to validate a skill if the user try to validate his own skills', async function () {
             const {skillTree, owner, otherAccount} = await deploySkillTree();
