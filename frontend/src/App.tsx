@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ethers } from "ethers";
 import HomePage from "./pages/HomePage/HomePage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
+import Navbar from "./components/Navbar/Navbar";
 import Loader from "./components/Loader/Loader";
 import SkillTree from "./contracts/SkillTree.json";
 import { MetamaskContextType } from "./types/metamask";
@@ -54,6 +55,7 @@ function App(): JSX.Element {
   return (
     <MetamaskContext.Provider value={context}>
       <Router>
+        <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
