@@ -23,7 +23,8 @@ interface SkillTreeContract extends Contract {
     editSkill: BaseContractMethod<any, void, void>;
     getUserSkillValidations: BaseContractMethod<any[], SkillValidationDto[]>;
     getUserSkills: BaseContractMethod<any, SkillDto[]>;
-    listUsers: BaseContractMethod<any, string[]>;
+  listUsers: BaseContractMethod<any, string[]>;
+  listProfiles: BaseContractMethod<any, string[]>;
 }
 
 export default SkillTreeContract;
