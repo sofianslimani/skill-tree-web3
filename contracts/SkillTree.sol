@@ -32,6 +32,12 @@ contract SkillTree {
         SkillValidationDto[] validations;
     }
 
+    struct ProfileDto {
+        string lastName;
+        string firstName;
+        SkillDto[] skills;
+    }
+
     mapping(address => Profile) private profiles;
     mapping(address => Skill[]) private skills;
     mapping(address => SkillValidation[]) private skillsValidation;
@@ -156,19 +162,37 @@ contract SkillTree {
         return nonCallerUsers;
     }
 
-    //
-    //    function getUserSkills(address _address) public view returns (Skill[] memory) {
-    //        //TODO : fill this
-    //    }
-    //
-    //    function getUser(address _address) public view returns (Profile memory) {
-    //        // TODO: fill this
-    //    }
-    //
-    //    function editProfile(string memory _lastName, string memory _firstName) public {
-    //        //TODO: fill this
-    //    }
-    //
+    function listProfiles() public view returns (ProfileDto[] memory) {
+        address [] memory users = listUsers();
+        ProfileDto[] memory profilesDto = new ProfileDto[](users.length);
+        for (uint i = 0; i < users.length; i++) {
+            Profile memory profile = profiles[users[i]];
+            profilesDto[i] = ProfileDto(
+                profile.lastName,
+                profile.firstName,
+                getUserSkills(users[i])
+            );
+        }
+        return profilesDto;
+    }
+
+    function getProfile(address _address) public view returns (ProfileDto memory) {
+        Profile memory profile = profiles[_address];
+        require(bytes(profile.lastName).length > 0 || bytes(profile.firstName).length > 0, "User does not exist");
+        return ProfileDto(
+            profile.lastName,
+            profile.firstName,
+            getUserSkills(_address)
+        );
+    }
+
+
+    function editProfile(string memory _lastName, string memory _firstName) public {
+        Profile memory profile = profiles[msg.sender];
+        require(bytes(profile.lastName).length > 0 || bytes(profile.firstName).length > 0, "Profile does not exist");
+        profiles[msg.sender] = Profile(_lastName, _firstName);
+    }
+
     function addSkill(string memory _name, uint _level) public {
         require(
             _level >= 1 && _level <= 5,
