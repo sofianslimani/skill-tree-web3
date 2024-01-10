@@ -1,14 +1,13 @@
 import { createContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ethers } from "ethers";
 import HomePage from "./pages/HomePage/HomePage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import Navbar from "./components/Navbar/Navbar";
 import Loader from "./components/Loader/Loader";
-
-export interface MetamaskContextType {
-  account: string | null;
-  contract: any; // Type of contract object is not defined yet
-}
+import SkillTree from "./contracts/SkillTree.json";
+import { MetamaskContextType } from "./types/metamask";
+import SkillTreeContract from "./types/contract";
 
 export const MetamaskContext = createContext<MetamaskContextType | null>(null);
 
@@ -20,10 +19,25 @@ function App(): JSX.Element {
       method: "eth_requestAccounts",
     });
 
-    setContext({
-      account: accounts[0],
-      contract: null,
-    });
+    const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    const contractABI = SkillTree.abi;
+
+    try {
+      const provider = new ethers.BrowserProvider((window as any).ethereum);
+      const signer = await provider.getSigner();
+      const contract = (await new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      )) as SkillTreeContract;
+
+      setContext({
+        account: accounts[0],
+        contract,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {

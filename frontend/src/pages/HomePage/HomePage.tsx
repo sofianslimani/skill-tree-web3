@@ -1,7 +1,8 @@
 import React, { useContext } from "react";
 import styles from "./HomePage.module.scss";
-import { MetamaskContext, MetamaskContextType } from "../../App";
+import { MetamaskContext } from "../../App";
 import { Link } from "react-router-dom";
+import { MetamaskContextType } from "../../types/metamask";
 
 const fakeUsers = [
   { id: 1, username: "UserOne", profession: "Développeur Frontend" },
