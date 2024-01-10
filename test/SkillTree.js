@@ -1,5 +1,5 @@
-const { expect } = require("chai");
-const { ethers } = require("hardhat");
+const {expect} = require("chai");
+const {ethers} = require("hardhat");
 
 describe("SkillTree", function () {
     async function deploySkillTree() {
@@ -7,19 +7,19 @@ describe("SkillTree", function () {
         const SkillTree = await ethers.getContractFactory("SkillTree");
         const skillTree = await SkillTree.deploy();
         await skillTree.waitForDeployment();
-        return { skillTree, owner, user1, user2 };
+        return {skillTree, owner, user1, user2};
     }
 
     describe("Deployment", function () {
         it("Should deploy without failing", async function () {
-            const { skillTree } = await deploySkillTree();
+            const {skillTree} = await deploySkillTree();
             expect(skillTree).to.not.equal(undefined);
         });
     });
 
     describe("User Management", function () {
         it('Should exclude the caller from the user list', async function () {
-            const { skillTree, owner, user1, user2 } = await deploySkillTree();
+            const {skillTree, owner, user1, user2} = await deploySkillTree();
             await skillTree.addUser(user1.address, "User1FirstName", "User1LastName");
             await skillTree.addUser(user2.address, "User2FirstName", "User2LastName");
 
@@ -28,7 +28,7 @@ describe("SkillTree", function () {
         });
 
         it('Should include all other users except the caller', async function () {
-            const { skillTree, user1, user2 } = await deploySkillTree();
+            const {skillTree, user1, user2} = await deploySkillTree();
             await skillTree.addUser(user1.address, "User1FirstName", "User1LastName");
             await skillTree.addUser(user2.address, "User2FirstName", "User2LastName");
 
@@ -41,23 +41,25 @@ describe("SkillTree", function () {
 
     describe("Skills", function () {
         it("Should list the users skills", async function () {
-            const { skillTree, owner } = await deploySkillTree();
+            const {skillTree, owner} = await deploySkillTree();
             const skills = await skillTree.getUserSkills(owner.address);
             expect(skills).to.eql([]);
         });
 
         it("Should add a skill to the user", async function () {
-            const { skillTree, owner } = await deploySkillTree();
+            const {skillTree, owner} = await deploySkillTree();
             await skillTree.addSkill('javascript', 3);
             const skills = await skillTree.getUserSkills(owner.address)
             expect(skills).to.eql([['javascript', BigInt(3), []]]);
         });
 
         it('should fail to add a skill if the skill level is <0 or >5', async function () {
-            const { skillTree, owner } = await deploySkillTree();
+            const {skillTree, owner} = await deploySkillTree();
+
             async function addSkill(skill, level) {
                 return await skillTree.addSkill(skill, level);
             }
+
             await expect(addSkill('javascript', -1)).to.be.rejected;
             await expect(addSkill('javascript', 0)).to.be.revertedWith('Skill level must be between 1 and 5');
             await expect(addSkill('javascript', 6)).to.be.revertedWith('Skill level must be between 1 and 5');
@@ -66,7 +68,7 @@ describe("SkillTree", function () {
         });
 
         it('should delete the skill and theses validation if it exist', async function () {
-            const { skillTree, owner } = await deploySkillTree();
+            const {skillTree, owner} = await deploySkillTree();
             await skillTree.addSkill('javascript', 3);
             await skillTree.deleteSkill(0);
             const skills = await skillTree.getUserSkills(owner.address);
@@ -76,14 +78,16 @@ describe("SkillTree", function () {
         })
 
         it('should fail to delete a skill if the skill does not exist', async function () {
-            const { skillTree, owner } = await deploySkillTree();
+            const {skillTree, owner} = await deploySkillTree();
+
             async function deleteSkill() {
                 return await skillTree.deleteSkill(0);
             }
+
             await expect(deleteSkill()).to.be.revertedWith('Skill does not exist');
         })
         it("should edit a skill", async function () {
-            const { skillTree, owner } = await deploySkillTree();
+            const {skillTree, owner} = await deploySkillTree();
             await skillTree.addSkill('javascript', 3);
             await skillTree.editSkill(0, 'javascript', 4);
             const skills = await skillTree.getUserSkills(owner.address)
@@ -91,33 +95,39 @@ describe("SkillTree", function () {
         })
 
         it('should fail to edit a skill if the skill does not exist', async function () {
-            const { skillTree, owner } = await deploySkillTree();
+            const {skillTree, owner} = await deploySkillTree();
+
             async function editSkill() {
                 return await skillTree.editSkill(0, 'javascript', 4);
             }
+
             await expect(editSkill()).to.be.revertedWith('Skill does not exist');
         })
     });
 
 
     describe('SkillValidation', function () {
-      it('should validate a skill', async function () {
+        it('should validate a skill', async function () {
             const {skillTree, owner, user1} = await deploySkillTree();
+            await skillTree.addUser(user1.address, "User1FirstName", "User1LastName");
             await skillTree.connect(owner).addSkill('javascript', 3);
             await skillTree.connect(user1).addSkillValidation(owner.address, 0);
             const skills = await skillTree.getUserSkills(owner.address)
-            expect(skills).to.eql([['javascript', BigInt(3), [[user1.address, BigInt(0)]]]]);
-      })
+            expect(skills).to.eql([['javascript', BigInt(3),
+                [[user1.address, ["User1LastName", "User1FirstName"], BigInt(0)]]
+            ]]);
+        })
         it('should only return the validation for the corresponding skill', async function () {
             const {skillTree, owner, user1} = await deploySkillTree();
             await skillTree.connect(owner).addSkill('javascript', 3);
             await skillTree.connect(owner).addSkill('javascript', 4);
+            await skillTree.addUser(user1.address, "User1FirstName", "User1LastName");
             await skillTree.connect(user1).addSkillValidation(owner.address, 0);
             await skillTree.connect(user1).addSkillValidation(owner.address, 1);
             const skills = await skillTree.getUserSkills(owner.address)
             expect(skills).to.eql([
-                ['javascript', BigInt(3), [[user1.address, BigInt(0)]]],
-                ['javascript', BigInt(4), [[user1.address, BigInt(1)]]]
+                ['javascript', BigInt(3), [[user1.address, ["User1LastName", "User1FirstName"], BigInt(0)]]],
+                ['javascript', BigInt(4), [[user1.address, ["User1LastName", "User1FirstName"], BigInt(1)]]]
             ]);
         })
         it('should fail to validate a skill if the skill does not exist', async function () {
@@ -132,5 +142,14 @@ describe("SkillTree", function () {
             }
             expect(addSkillValidation()).to.be.revertedWith('You cannot validate your own skills');
         })
+        it("should fail to validate a skill if the validator profile does not exist", async function () {
+            const {skillTree, owner, user1} = await deploySkillTree();
+            await skillTree.addSkill('javascript', 3);
+            async function addSkillValidation() {
+                return await skillTree.addSkillValidation(user1.address, 0);
+            }
+            expect(addSkillValidation()).to.be.revertedWith('User does not exist');
+        })
+
     })
 });
