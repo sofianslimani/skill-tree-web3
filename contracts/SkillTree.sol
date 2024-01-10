@@ -38,12 +38,20 @@ contract SkillTree {
 
     constructor() {}
 
-    function getUserSkills(address _address) public view returns (SkillDto[] memory) {
+    function getUserSkills(
+        address _address
+    ) public view returns (SkillDto[] memory) {
         SkillDto[] memory userSkills = new SkillDto[](skills[_address].length);
         for (uint i = 0; i < skills[_address].length; i++) {
             Skill memory skill = skills[_address][i];
-            SkillValidation[] memory skillValidations = filterSkillValidation(_address, uint32(i));
-            SkillValidationDto[] memory skillValidationsDto = new SkillValidationDto[](skillValidations.length);
+            SkillValidation[] memory skillValidations = filterSkillValidation(
+                _address,
+                uint32(i)
+            );
+            SkillValidationDto[]
+                memory skillValidationsDto = new SkillValidationDto[](
+                    skillValidations.length
+                );
             for (uint j = 0; j < skillValidations.length; j++) {
                 SkillValidation memory skillValidation = skillValidations[j];
                 skillValidationsDto[j] = SkillValidationDto({
@@ -61,9 +69,16 @@ contract SkillTree {
         return userSkills;
     }
 
-    function getUserSkillValidations(address _address) public view returns (SkillValidationDto[] memory) {
-        SkillValidation[] memory userSkillsValidation = skillsValidation[_address];
-        SkillValidationDto[] memory userSkillsValidationDto = new SkillValidationDto[](userSkillsValidation.length);
+    function getUserSkillValidations(
+        address _address
+    ) public view returns (SkillValidationDto[] memory) {
+        SkillValidation[] memory userSkillsValidation = skillsValidation[
+            _address
+        ];
+        SkillValidationDto[]
+            memory userSkillsValidationDto = new SkillValidationDto[](
+                userSkillsValidation.length
+            );
         for (uint i = 0; i < userSkillsValidation.length; i++) {
             SkillValidation memory skillValidation = userSkillsValidation[i];
             userSkillsValidationDto[i] = SkillValidationDto({
@@ -75,8 +90,13 @@ contract SkillTree {
         return userSkillsValidationDto;
     }
 
-    function filterSkillValidation(address _address, uint32 _skillId) private view returns (SkillValidation[] memory) {
-        SkillValidation[] memory userSkillsValidation = skillsValidation[_address];
+    function filterSkillValidation(
+        address _address,
+        uint32 _skillId
+    ) private view returns (SkillValidation[] memory) {
+        SkillValidation[] memory userSkillsValidation = skillsValidation[
+            _address
+        ];
         uint resultCount = 0;
         for (uint j = 0; j < userSkillsValidation.length; j++) {
             SkillValidation memory skillValidation = userSkillsValidation[j];
@@ -84,7 +104,9 @@ contract SkillTree {
                 resultCount++;
             }
         }
-        SkillValidation[] memory skillValidations = new SkillValidation[](resultCount);
+        SkillValidation[] memory skillValidations = new SkillValidation[](
+            resultCount
+        );
         uint resultIndex = 0;
         for (uint j = 0; j < userSkillsValidation.length; j++) {
             SkillValidation memory skillValidation = userSkillsValidation[j];
@@ -98,7 +120,11 @@ contract SkillTree {
 
     address[] private userAddresses;
 
-    function addUser(address _userAddress, string memory _firstName, string memory _lastName) public {
+    function addUser(
+        address _userAddress,
+        string memory _firstName,
+        string memory _lastName
+    ) public {
         // Ajouter le profil
         profiles[_userAddress] = Profile(_lastName, _firstName);
 
@@ -131,33 +157,37 @@ contract SkillTree {
     }
 
     //
-//    function getUserSkills(address _address) public view returns (Skill[] memory) {
-//        //TODO : fill this
-//    }
-//
-//    function getUser(address _address) public view returns (Profile memory) {
-//        // TODO: fill this
-//    }
-//
-//    function editProfile(string memory _lastName, string memory _firstName) public {
-//        //TODO: fill this
-//    }
-//
+    //    function getUserSkills(address _address) public view returns (Skill[] memory) {
+    //        //TODO : fill this
+    //    }
+    //
+    //    function getUser(address _address) public view returns (Profile memory) {
+    //        // TODO: fill this
+    //    }
+    //
+    //    function editProfile(string memory _lastName, string memory _firstName) public {
+    //        //TODO: fill this
+    //    }
+    //
     function addSkill(string memory _name, uint _level) public {
-        require(_level >= 1 && _level <= 5, "Skill level must be between 1 and 5");
-        skills[msg.sender].push(Skill({
-            name: _name,
-            level: _level
-        }));
+        require(
+            _level >= 1 && _level <= 5,
+            "Skill level must be between 1 and 5"
+        );
+        skills[msg.sender].push(Skill({name: _name, level: _level}));
     }
 
-    function editSkill(uint32 _skillId, string memory _name, uint _level) public {
+    function editSkill(
+        uint32 _skillId,
+        string memory _name,
+        uint _level
+    ) public {
         require(_skillId < skills[msg.sender].length, "Skill does not exist");
-        require(_level >= 1 && _level <= 5, "Skill level must be between 1 and 5");
-        skills[msg.sender][_skillId] = Skill({
-            name: _name,
-            level: _level
-        });
+        require(
+            _level >= 1 && _level <= 5,
+            "Skill level must be between 1 and 5"
+        );
+        skills[msg.sender][_skillId] = Skill({name: _name, level: _level});
     }
 
     function deleteSkill(uint32 _skillId) public {
@@ -174,8 +204,14 @@ contract SkillTree {
         // Do the same for skillsValidation
         for (uint i = 0; i < skillsValidation[msg.sender].length; i++) {
             if (skillsValidation[msg.sender][i].skillId == _skillId) {
-                for (uint j = i; j < skillsValidation[msg.sender].length - 1; j++) {
-                    skillsValidation[msg.sender][j] = skillsValidation[msg.sender][j + 1];
+                for (
+                    uint j = i;
+                    j < skillsValidation[msg.sender].length - 1;
+                    j++
+                ) {
+                    skillsValidation[msg.sender][j] = skillsValidation[
+                        msg.sender
+                    ][j + 1];
                 }
                 skillsValidation[msg.sender].pop();
                 i--; // Decrement i as the array length has decreased
@@ -184,14 +220,19 @@ contract SkillTree {
     }
 
     function addSkillValidation(address _userAddress, uint32 _skillId) public {
-        require(msg.sender != _userAddress, "You cannot validate your own skills");
+        require(
+            msg.sender != _userAddress,
+            "You cannot validate your own skills"
+        );
         require(_skillId < skills[_userAddress].length, "Skill does not exist");
         Profile memory profile = profiles[msg.sender];
-        require(bytes(profile.lastName).length > 0 || bytes(profile.firstName).length > 0, "Validator does not exist");
-        skillsValidation[_userAddress].push(SkillValidation({
-            validator: msg.sender,
-            skillId: _skillId
-        }));
+        require(
+            bytes(profile.lastName).length > 0 ||
+                bytes(profile.firstName).length > 0,
+            "Validator does not exist"
+        );
+        skillsValidation[_userAddress].push(
+            SkillValidation({validator: msg.sender, skillId: _skillId})
+        );
     }
-
 }

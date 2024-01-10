@@ -5,11 +5,8 @@ import HomePage from "./pages/HomePage/HomePage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import Loader from "./components/Loader/Loader";
 import SkillTree from "./contracts/SkillTree.json";
-
-export interface MetamaskContextType {
-  account: string | null;
-  contract: ethers.Contract;
-}
+import { MetamaskContextType } from "./types/metamask";
+import SkillTreeContract from "./types/contract";
 
 export const MetamaskContext = createContext<MetamaskContextType | null>(null);
 
@@ -27,14 +24,11 @@ function App(): JSX.Element {
     try {
       const provider = new ethers.BrowserProvider((window as any).ethereum);
       const signer = await provider.getSigner();
-      const contract = await new ethers.Contract(
+      const contract = (await new ethers.Contract(
         contractAddress,
         contractABI,
         signer
-      );
-
-      const test = await contract.getUserSkills;
-      console.log(test);
+      )) as SkillTreeContract;
 
       setContext({
         account: accounts[0],
