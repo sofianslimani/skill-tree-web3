@@ -124,11 +124,16 @@ contract SkillTree {
             level: _level
         }));
     }
-//
-//    function editSkill(uint32 _skillId, Skill _newSkill) public  {
-//        //TODO: fill this
-//    }
-//
+
+    function editSkill(uint32 _skillId, string memory _name, uint _level) public  {
+        require(_skillId < skills[msg.sender].length, "Skill does not exist");
+        require(_level >= 1 && _level <= 5, "Skill level must be between 1 and 5");
+        skills[msg.sender][_skillId] = Skill({
+            name: _name,
+            level: _level
+        });
+    }
+
     function deleteSkill(uint32 _skillId) public  {
         require(_skillId < skills[msg.sender].length, "Skill does not exist");
 
@@ -150,26 +155,6 @@ contract SkillTree {
                 i--; // Decrement i as the array length has decreased
             }
         }
-    }
-
-    function filterSkills(uint32 _skillId) private view returns(Skill[] memory) {
-        uint resultCount = 0;
-        for (uint i = 0; i < skills[msg.sender].length; i++) {
-            Skill memory skill = skills[msg.sender][i];
-            if (i != _skillId) {
-                resultCount++;
-            }
-        }
-        Skill[] memory result = new Skill[](resultCount);
-        uint resultIndex = 0;
-        for (uint i = 0; i < skills[msg.sender].length; i++) {
-            Skill memory skill = skills[msg.sender][i];
-            if (i != _skillId) {
-                result[resultIndex] = skill;
-                resultIndex++;
-            }
-        }
-        return result;
     }
 
     function addSkillValidation(address _userAddress, uint32 _skillId) public {
