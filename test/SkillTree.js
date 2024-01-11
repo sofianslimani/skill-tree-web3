@@ -62,6 +62,21 @@ describe("SkillTree", function () {
             expect(users.length).to.equal(2);
         });
 
+        it('Should add a user', async function () {
+            const {skillTree, user1} = await deploySkillTree();
+            await skillTree.addUser(user1.address, "User1FirstName", "User1LastName");
+            const users = await skillTree.listUsers();
+            expect(users).to.include(user1.address);
+        })
+
+        it("Should not add the user if it already exist", async function () {
+            const {skillTree, user1} = await deploySkillTree();
+            await skillTree.addUser(user1.address, "User1FirstName", "User1LastName");
+            await skillTree.addUser(user1.address, "User1FirstName", "User1LastName");
+            const users = await skillTree.listUsers();
+            expect(users.length).to.equal(1);
+        })
+
         it('should list the users profile', async function () {
             const {skillTree, owner, user1, user2} = await deploySkillTree();
             await skillTree.addUser(user1.address, "User1FirstName", "User1LastName");
@@ -79,15 +94,22 @@ describe("SkillTree", function () {
             await skillTree.addUser(user1.address, "User1FirstName", "User1LastName");
             const userProfile = await skillTree.getProfile(user1.address);
             const transformedProfile = transformProfile(userProfile);
-            expect(transformedProfile).to.eql({lastName: "User1LastName", firstName: "User1FirstName", skills: [], userAddress: user1.address});
+            expect(transformedProfile).to.eql({
+                lastName: "User1LastName",
+                firstName: "User1FirstName",
+                skills: [],
+                userAddress: user1.address
+            });
         })
 
         it('should handle existing and non-existing users correctly', async () => {
-            const { skillTree, user1 } = await deploySkillTree();
+            const {skillTree, user1} = await deploySkillTree();
             const nonExistentAddress = '0x0000000000000000000000000000000000000000';
+
             async function getUser(address) {
                 await skillTree.getUser(address)
             }
+
             expect(getUser(nonExistentAddress)).to.be.rejectedWith('User does not exist');
         });
 
@@ -97,7 +119,12 @@ describe("SkillTree", function () {
             await skillTree.editProfile("LastName", "FirstName");
             const userProfile = await skillTree.getProfile(owner.address);
             const transformedProfile = transformProfile(userProfile);
-            expect(transformedProfile).to.eql({lastName: "LastName", firstName: "FirstName", skills: [], userAddress: owner.address});
+            expect(transformedProfile).to.eql({
+                lastName: "LastName",
+                firstName: "FirstName",
+                skills: [],
+                userAddress: owner.address
+            });
         })
     });
 
@@ -182,7 +209,15 @@ describe("SkillTree", function () {
             const skills = await skillTree.getUserSkills(owner.address)
             const transformedSkills = transformSkills(skills);
             expect(transformedSkills).to.eqls([
-                {name: 'javascript', level: 3, validations: [{validator: {lastName: "User1LastName", firstName: "User1FirstName"}, validatorAddress: user1.address, skillId: 0}]}
+                {
+                    name: 'javascript',
+                    level: 3,
+                    validations: [{
+                        validator: {lastName: "User1LastName", firstName: "User1FirstName"},
+                        validatorAddress: user1.address,
+                        skillId: 0
+                    }]
+                }
             ]);
         })
         it('should only return the validation for the corresponding skill', async function () {
@@ -197,12 +232,20 @@ describe("SkillTree", function () {
             expect(transformedSkills[0]).to.eqls({
                 name: 'javascript',
                 level: 3,
-                validations: [{validator: {lastName: "User1LastName", firstName: "User1FirstName"}, validatorAddress: user1.address, skillId: 0}]
+                validations: [{
+                    validator: {lastName: "User1LastName", firstName: "User1FirstName"},
+                    validatorAddress: user1.address,
+                    skillId: 0
+                }]
             });
             expect(transformedSkills[1]).to.eqls({
                 name: 'javascript',
                 level: 4,
-                validations: [{validator: {lastName: "User1LastName", firstName: "User1FirstName"}, validatorAddress: user1.address, skillId: 1}]
+                validations: [{
+                    validator: {lastName: "User1LastName", firstName: "User1FirstName"},
+                    validatorAddress: user1.address,
+                    skillId: 1
+                }]
             });
             expect(transformedSkills.length).to.equal(2);
         })

@@ -19,7 +19,7 @@ function App(): JSX.Element {
             method: "eth_requestAccounts",
         });
 
-        const contractAddress = "0x53F93356084FA40fc82cbC2eEb17B0931f1Af13C";
+        const contractAddress = "0xD6A860D036284D917bB852bdDd48f296C6BDa6D2";
         const contractABI = SkillTree.abi;
 
         try {
