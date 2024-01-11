@@ -1,317 +1,339 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 import styles from "./ProfilePage.module.scss";
 import Rating from "react-rating";
-import { MetamaskContext } from "../../App";
+import {MetamaskContext} from "../../App";
+import {useParams} from "react-router-dom";
 
 const initialProfileData = {
-  username: "Jane Doe",
-  bio: "Développeuse Frontend | Spécialiste React & SASS | Passionnée par l'UI/UX",
-  skills: [
-    {
-      name: "React",
-      rating: 3,
-      validators: ["User1", "User2", "User2", "User2", "User2", "User2"],
-    },
-    { name: "JavaScript", rating: 4, validators: [] },
-    { name: "SASS", rating: 5, validators: ["User3"] },
-    { name: "UI/UX Design", rating: 3, validators: [] },
-  ],
+    username: "Jane Doe",
+    bio: "Développeuse Frontend | Spécialiste React & SASS | Passionnée par l'UI/UX",
+    skills: [
+        {
+            name: "React",
+            rating: 3,
+            validators: ["User1", "User2", "User2", "User2", "User2", "User2"],
+        },
+        {name: "JavaScript", rating: 4, validators: []},
+        {name: "SASS", rating: 5, validators: ["User3"]},
+        {name: "UI/UX Design", rating: 3, validators: []},
+    ],
 };
-const ProfilePage = ({ isOwnProfile = true }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({
-    username: "",
-    bio: "",
-    skills: [],
-  });
-  const [newSkill, setNewSkill] = useState("");
-  const metamaskContext = useContext(MetamaskContext);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [firstNameUser, setFirstNameUser] = useState("");
-  const [lastNameUser, setLastNameUser] = useState("");
+const ProfilePage = ({isOwnProfile = true}) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [profileData, setProfileData] = useState({
+        username: "",
+        bio: "",
+        skills: [],
+    });
+    const [newSkill, setNewSkill] = useState("");
+    const metamaskContext = useContext(MetamaskContext);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [firstNameUser, setFirstNameUser] = useState("");
+    const [lastNameUser, setLastNameUser] = useState("");
 
-  console.log(metamaskContext);
+    const routeParams = useParams();
+    const {address} = routeParams;
+    console.log(address)
+    console.log(metamaskContext);
 
-  const checkAndFetchProfile = async () => {
-    try {
-      const profileExists = await metamaskContext.contract.addUser(
-        metamaskContext.account,
-        "John",
-        "Doe"
-      );
+    useEffect(() => {
+        if (address) {
+            fetchProfileData();
+        } else {
+            setProfileData({
+                username: "",
+                bio: "",
+                skills: [],
+            })
+        }
+    }, [address])
 
-      if (profileExists) {
-        setIsAuthenticated(true);
-        fetchProfileData();
-      }
-    } catch (error) {
-      console.error(
-        "Erreur lors de la vérification ou de la récupération du profil: ",
-        error
-      );
-    }
-  };
+    const checkAndFetchProfile = async () => {
+        try {
+            setIsLoading(true);
+            const profileExists = await metamaskContext.contract.addUser(
+                metamaskContext.account,
+                "John",
+                "Doe"
+            );
 
-  const fetchProfileData = async () => {
-    try {
-      setIsLoading(true);
+            if (profileExists) {
+                setIsAuthenticated(true);
+                fetchProfileData();
+            }
+        } catch (error) {
+            console.error(
+                "Erreur lors de la vérification ou de la récupération du profil: ",
+                error
+            );
+        }
+    };
 
-      const userProfile = await metamaskContext.contract.getProfile(
-        metamaskContext.account
-      );
+    const fetchProfileData = async () => {
+        try {
+            setIsLoading(true);
 
-      setIsLoading(false);
+            const userProfile = await metamaskContext.contract.getProfile(
+                address || metamaskContext.account
+            );
 
-      setProfileData({
-        ...profileData,
+            setIsLoading(false);
+            console.log(userProfile, userProfile[2])
 
-        username: userProfile[1] + " " + userProfile[0],
-        bio: "Bio à définir",
-        skills: userProfile[2].map((skill) => ({
-          name: skill[0],
-          rating: Number(skill[1]),
-          validators: skill[2].map(
-            (v) => v.validator[0] + " " + v.validator[1]
-          ),
-        })),
-      });
+            setProfileData({
+                ...profileData,
 
-      setFirstNameUser(userProfile[1]);
-      setLastNameUser(userProfile[0]);
-    } catch (error) {
-      console.error("Erreur lors de la récupération du profil: ", error);
-    }
-  };
+                username: userProfile[1] + " " + userProfile[2],
+                bio: "Bio à définir",
+                skills: userProfile[3].map((skill) => ({
+                    name: skill[0],
+                    rating: Number(skill[1]),
+                    validators: skill[2].map(
+                        (v) => v.validator[0] + " " + v.validator[1]
+                    ),
+                })),
+            });
 
-  const handleAddSkill = async () => {
-    if (!newSkill) return;
-    try {
-      const tx = await metamaskContext.contract.addSkill(newSkill, 1);
-      await tx.wait();
+            setFirstNameUser(userProfile[1]);
+            setLastNameUser(userProfile[2]);
+        } catch (error) {
+            console.error("Erreur lors de la récupération du profil: ", error);
+        }
+    };
 
-      fetchProfileData();
-    } catch (error) {
-      console.error("Erreur lors de l'ajout d'une compétence: ", error);
-    }
-  };
+    const handleAddSkill = async () => {
+        if (!newSkill) return;
+        try {
+            setIsLoading(true);
+            const tx = await metamaskContext.contract.addSkill(newSkill, 1);
+            await tx.wait();
 
-  const handleRemoveSkill = async (skillToRemove) => {
-    try {
-      const skillIndex = profileData.skills.findIndex(
-        (skill) => skill.name === skillToRemove
-      );
-      if (skillIndex === -1) return;
-      const tx = await metamaskContext.contract.deleteSkill(skillIndex);
-      await tx.wait();
+            fetchProfileData();
+        } catch (error) {
+            console.error("Erreur lors de l'ajout d'une compétence: ", error);
+        }
+    };
 
-      fetchProfileData();
-    } catch (error) {
-      console.error("Erreur lors de la suppression d'une compétence: ", error);
-    }
-  };
+    const handleRemoveSkill = async (skillToRemove) => {
+        try {
+            setIsLoading(true);
+            const skillIndex = profileData.skills.findIndex(
+                (skill) => skill.name === skillToRemove
+            );
+            if (skillIndex === -1) return;
+            const tx = await metamaskContext.contract.deleteSkill(skillIndex);
+            await tx.wait();
 
-  const handleSkillRatingChange = async (skillName, newRating) => {
-    try {
-      const skillIndex = profileData.skills.findIndex(
-        (skill) => skill.name === skillName
-      );
-      if (skillIndex === -1) return;
-      const tx = await metamaskContext.contract.editSkill(
-        skillIndex,
-        skillName,
-        newRating
-      );
-      await tx.wait();
-      fetchProfileData();
-    } catch (error) {
-      console.error("Erreur lors de la modification d'une compétence: ", error);
-    }
-  };
+            fetchProfileData();
+        } catch (error) {
+            console.error("Erreur lors de la suppression d'une compétence: ", error);
+        }
+    };
 
-  const handleSkillValidation = async (skillName) => {
-    try {
-      const skillIndex = profileData.skills.findIndex(
-        (skill) => skill.name === skillName
-      );
-      if (skillIndex === -1) return;
-      await metamaskContext.contract.addSkillValidation(
-        metamaskContext.account,
-        skillIndex
-      );
-      fetchProfileData();
-    } catch (error) {
-      console.error("Erreur lors de la validation d'une compétence: ", error);
-    }
-  };
+    const handleSkillRatingChange = async (skillName, newRating) => {
+        try {
+            const skillIndex = profileData.skills.findIndex(
+                (skill) => skill.name === skillName
+            );
+            if (skillIndex === -1) return;
+            const tx = await metamaskContext.contract.editSkill(
+                skillIndex,
+                skillName,
+                newRating
+            );
+            await tx.wait();
+            fetchProfileData();
+        } catch (error) {
+            console.error("Erreur lors de la modification d'une compétence: ", error);
+        }
+    };
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
+    const handleSkillValidation = async (skillName) => {
+        try {
+            const skillIndex = profileData.skills.findIndex(
+                (skill) => skill.name === skillName
+            );
+            if (skillIndex === -1) return;
+            setIsLoading(true);
+            const tx = await metamaskContext.contract.addSkillValidation(
+                metamaskContext.account,
+                skillIndex
+            );
+            await tx.wait();
+            fetchProfileData();
+        } catch (error) {
+            console.error("Erreur lors de la validation d'une compétence: ", error);
+        }
+    };
 
-  const handleCancelClick = () => {
-    setIsEditing(false);
-  };
+    const handleEditClick = () => {
+        setIsEditing(true);
+    };
 
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
+    const handleCancelClick = () => {
+        setIsEditing(false);
+    };
 
-    const [currentFirstName, currentLastName] = profileData.username.split(" ");
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
 
-    if (
-      firstNameUser !== currentFirstName ||
-      lastNameUser !== currentLastName
-    ) {
-      await handleProfileUpdate();
-    }
+        const [currentFirstName, currentLastName] = profileData.username.split(" ");
 
-    setIsEditing(false);
-  };
+        if (
+            firstNameUser !== currentFirstName ||
+            lastNameUser !== currentLastName
+        ) {
+            await handleProfileUpdate();
+        }
 
-  const handleProfileUpdate = async (event) => {
-    try {
-      const tx = await metamaskContext.contract.editProfile(
-        lastNameUser,
-        firstNameUser
-      );
+        setIsEditing(false);
+    };
 
-      await tx.wait();
-      fetchProfileData();
-    } catch (error) {
-      console.error("Erreur lors de la mise à jour du profil: ", error);
-    }
-  };
-  const handleSkillChange = (event) => {
-    setNewSkill(event.target.value);
-  };
+    const handleProfileUpdate = async (event) => {
+        try {
+            const tx = await metamaskContext.contract.editProfile(
+                lastNameUser,
+                firstNameUser
+            );
 
-  const renderValidators = (validators) => {
-    if (validators.length <= 4) {
-      return validators.join(", ");
-    } else {
-      return `${validators.slice(0, 4).join(", ")} et ${
-        validators.length - 4
-      } autres`;
-    }
-  };
+            await tx.wait();
+            fetchProfileData();
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour du profil: ", error);
+        }
+    };
+    const handleSkillChange = (event) => {
+        setNewSkill(event.target.value);
+    };
 
-  return (
-    <div className={styles.profilePage}>
-      <div>{isLoading ? "Loading" : "ready"}</div>
-      <div className={styles.profileHeader}>
-        <h1 className={styles.username}>{profileData.username}</h1>
-        <p className={styles.bio}>{profileData.bio}</p>
-      </div>
-      <div className={styles.profileSkills}>
-        {profileData.skills.map((skill, index) => (
-          <div key={index} className={styles.skillItem}>
-            <span>{skill.name}</span>
-            <Rating
-              initialRating={skill.rating}
-              readonly={!isEditing}
-              onChange={(newRating) =>
-                handleSkillRatingChange(skill.name, newRating)
-              }
-            />
-            {!isEditing && !isOwnProfile && (
-              <button onClick={() => handleSkillValidation(skill.name)}>
-                {skill.validators.includes("CurrentUser")
-                  ? "Annuler"
-                  : "Valider"}
-              </button>
-            )}
-            {skill.validators && skill.validators.length > 0 && (
-              <div className={styles.validationsCount}>
-                {skill.validators.length}
-                {skill.validators.length > 1
-                  ? " recommandations"
-                  : " recommandation"}
-              </div>
-            )}
-            <div className={styles.validators}>
-              {renderValidators(skill.validators)}
+    const renderValidators = (validators) => {
+        if (validators.length <= 4) {
+            return validators.join(", ");
+        } else {
+            return `${validators.slice(0, 4).join(", ")} et ${
+                validators.length - 4
+            } autres`;
+        }
+    };
+
+    return (
+        <div className={styles.profilePage}>
+            <div>{isLoading ? "Loading" : "ready"}</div>
+            <div className={styles.profileHeader}>
+                <h1 className={styles.username}>{profileData.username}</h1>
+                <p className={styles.bio}>{profileData.bio}</p>
             </div>
-          </div>
-        ))}
-      </div>
-      {isEditing ? (
-        <form onSubmit={handleFormSubmit} className={styles.profileForm}>
-          <div className={styles.formField}>
-            <label htmlFor="username">Nom d'utilisateur</label>
-            <input
-              className={styles.formField}
-              type="text"
-              value={firstNameUser}
-              onChange={(e) => setFirstNameUser(e.target.value)}
-              placeholder="Prénom"
-            />
-            <input
-              className={styles.formField}
-              type="text"
-              value={lastNameUser}
-              onChange={(e) => setLastNameUser(e.target.value)}
-              placeholder="Nom de famille"
-            />
-          </div>
-          <div className={styles.formField}>
-            <label htmlFor="bio">Biographie</label>
-            <textarea
-              id="bio"
-              value={profileData.bio}
-              onChange={(e) =>
-                setProfileData({ ...profileData, bio: e.target.value })
-              }
-            />
-          </div>
-          <div className={styles.formField}>
-            <label htmlFor="newSkill">Ajouter une compétence</label>
-            <input
-              type="text"
-              id="newSkill"
-              value={newSkill}
-              onChange={handleSkillChange}
-            />
-            <button type="button" onClick={handleAddSkill}>
-              Ajouter
-            </button>
-          </div>
-          {profileData.skills.map((skill, index) => (
-            <div key={index} className={styles.skillItem}>
-              {skill.name}
-              <button
-                type="button"
-                onClick={() => handleRemoveSkill(skill.name)}
-              >
-                Retirer
-              </button>
+            <div className={styles.profileSkills}>
+                {profileData.skills.map((skill, index) => (
+                    <div key={index} className={styles.skillItem}>
+                        <span>{skill.name}</span>
+                        <Rating
+                            initialRating={skill.rating}
+                            readonly={!isEditing}
+                            onChange={(newRating) =>
+                                handleSkillRatingChange(skill.name, newRating)
+                            }
+                        />
+                        {!isEditing && !isOwnProfile && (
+                            <button onClick={() => handleSkillValidation(skill.name)}>
+                                {skill.validators.includes("CurrentUser")
+                                    ? "Annuler"
+                                    : "Valider"}
+                            </button>
+                        )}
+                        {skill.validators && skill.validators.length > 0 && (
+                            <div className={styles.validationsCount}>
+                                {skill.validators.length}
+                                {skill.validators.length > 1
+                                    ? " recommandations"
+                                    : " recommandation"}
+                            </div>
+                        )}
+                        <div className={styles.validators}>
+                            {renderValidators(skill.validators)}
+                        </div>
+                    </div>
+                ))}
             </div>
-          ))}
-          <div className={styles.formActions}>
-            <button type="submit">Enregistrer les modifications</button>
-            <button type="button" onClick={handleCancelClick}>
-              Annuler
-            </button>
-          </div>
-        </form>
-      ) : (
-        <>
-          {isAuthenticated && (
-            <button onClick={handleEditClick} className={styles.editButton}>
-              Modifier le profil
-            </button>
-          )}
-          {!isAuthenticated && (
-            <button
-              onClick={checkAndFetchProfile}
-              className={styles.editButton}
-            >
-              Se connecter
-            </button>
-          )}
-        </>
-      )}
-    </div>
-  );
+            {isEditing ? (
+                <form onSubmit={handleFormSubmit} className={styles.profileForm}>
+                    <div className={styles.formField}>
+                        <label htmlFor="username">Nom d'utilisateur</label>
+                        <input
+                            className={styles.formField}
+                            type="text"
+                            value={firstNameUser}
+                            onChange={(e) => setFirstNameUser(e.target.value)}
+                            placeholder="Prénom"
+                        />
+                        <input
+                            className={styles.formField}
+                            type="text"
+                            value={lastNameUser}
+                            onChange={(e) => setLastNameUser(e.target.value)}
+                            placeholder="Nom de famille"
+                        />
+                    </div>
+                    <div className={styles.formField}>
+                        <label htmlFor="bio">Biographie</label>
+                        <textarea
+                            id="bio"
+                            value={profileData.bio}
+                            onChange={(e) =>
+                                setProfileData({...profileData, bio: e.target.value})
+                            }
+                        />
+                    </div>
+                    <div className={styles.formField}>
+                        <label htmlFor="newSkill">Ajouter une compétence</label>
+                        <input
+                            type="text"
+                            id="newSkill"
+                            value={newSkill}
+                            onChange={handleSkillChange}
+                        />
+                        <button type="button" onClick={handleAddSkill}>
+                            Ajouter
+                        </button>
+                    </div>
+                    {profileData.skills.map((skill, index) => (
+                        <div key={index} className={styles.skillItem}>
+                            {skill.name}
+                            <button
+                                type="button"
+                                onClick={() => handleRemoveSkill(skill.name)}
+                            >
+                                Retirer
+                            </button>
+                        </div>
+                    ))}
+                    <div className={styles.formActions}>
+                        <button type="submit">Enregistrer les modifications</button>
+                        <button type="button" onClick={handleCancelClick}>
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            ) : (isOwnProfile ?
+                    <>
+                        {isAuthenticated && (
+                            <button onClick={handleEditClick} className={styles.editButton}>
+                                Modifier le profil
+                            </button>
+                        )}
+                        {!isAuthenticated && (
+                            <button
+                                onClick={checkAndFetchProfile}
+                                className={styles.editButton}
+                            >
+                                Se connecter
+                            </button>
+                        )}
+                    </> : <></>
+            )}
+        </div>
+    );
 };
 
 export default ProfilePage;
