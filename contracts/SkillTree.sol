@@ -133,8 +133,17 @@ contract SkillTree {
         string memory _lastName
     ) public {
         // Ajouter le profil
+        bool userExists = false;
+        for (uint i = 0; i < userAddresses.length; i++) {
+            if (userAddresses[i] == _userAddress) {
+                userExists = true;
+                break;
+            }
+        }
+        if (userExists) {
+            return;
+        }
         profiles[_userAddress] = Profile(_lastName, _firstName);
-
         // Ajouter l'adresse à la liste des adresses
         userAddresses.push(_userAddress);
     }

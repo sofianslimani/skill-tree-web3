@@ -57,6 +57,7 @@ const ProfilePage = ({ isOwnProfile = true }) => {
         "John",
         "Doe"
       );
+      await profileExists.wait();
 
       if (profileExists) {
         setIsAuthenticated(true);
