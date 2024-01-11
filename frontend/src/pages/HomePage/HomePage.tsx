@@ -16,7 +16,6 @@ const HomePage = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   const mapUsersProfiles = (users: any) => {
-    /*      */ console.log("tmp", users);
     return users.map((user: any) => {
       return {
         adress: user[0],
