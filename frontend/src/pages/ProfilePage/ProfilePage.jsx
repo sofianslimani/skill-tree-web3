@@ -3,21 +3,11 @@ import styles from "./ProfilePage.module.scss";
 import Rating from "react-rating";
 import { MetamaskContext } from "../../App";
 import { useParams } from "react-router-dom";
+import {
+  LoadingBadge,
+  ReadyBadge,
+} from "../../components/LoaderProfile/LoaderProfile";
 
-const initialProfileData = {
-  username: "Jane Doe",
-  bio: "Développeuse Frontend | Spécialiste React & SASS | Passionnée par l'UI/UX",
-  skills: [
-    {
-      name: "React",
-      rating: 3,
-      validators: ["User1", "User2", "User2", "User2", "User2", "User2"],
-    },
-    { name: "JavaScript", rating: 4, validators: [] },
-    { name: "SASS", rating: 5, validators: ["User3"] },
-    { name: "UI/UX Design", rating: 3, validators: [] },
-  ],
-};
 const ProfilePage = ({ isOwnProfile = true }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -34,8 +24,6 @@ const ProfilePage = ({ isOwnProfile = true }) => {
 
   const routeParams = useParams();
   const { address } = routeParams;
-  console.log(address);
-  console.log(metamaskContext);
 
   useEffect(() => {
     if (address) {
@@ -57,7 +45,6 @@ const ProfilePage = ({ isOwnProfile = true }) => {
         "John",
         "Doe"
       );
-      await profileExists.wait();
 
       if (profileExists) {
         setIsAuthenticated(true);
@@ -78,9 +65,7 @@ const ProfilePage = ({ isOwnProfile = true }) => {
       const userProfile = await metamaskContext.contract.getProfile(
         address || metamaskContext.account
       );
-
       setIsLoading(false);
-      console.log(userProfile, userProfile[2]);
 
       setProfileData({
         ...profileData,
@@ -224,7 +209,7 @@ const ProfilePage = ({ isOwnProfile = true }) => {
 
   return (
     <div className={styles.profilePage}>
-      <div>{isLoading ? "Loading" : "ready"}</div>
+      {isLoading ? <LoadingBadge /> : <ReadyBadge />}
       <div className={styles.profileHeader}>
         <h1 className={styles.username}>{profileData.username}</h1>
         <p className={styles.bio}>{profileData.bio}</p>

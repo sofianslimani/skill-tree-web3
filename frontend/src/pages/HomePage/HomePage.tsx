@@ -32,7 +32,6 @@ const HomePage = () => {
 
   useEffect(() => {
     getUsers().then((users) => {
-      console.log(users);
       setUsers(users);
     });
   }, []);
