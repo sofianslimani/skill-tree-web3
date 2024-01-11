@@ -19,7 +19,7 @@ function App(): JSX.Element {
       method: "eth_requestAccounts",
     });
 
-    const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    const contractAddress = "0x53F93356084FA40fc82cbC2eEb17B0931f1Af13C";
     const contractABI = SkillTree.abi;
 
     try {
@@ -32,8 +32,6 @@ function App(): JSX.Element {
       )) as SkillTreeContract;
 
       console.log(accounts);
-
-      await contract.addUser(accounts[1], "UserOne", "Développeur Frontend");
 
       setContext({
         account: accounts[0],

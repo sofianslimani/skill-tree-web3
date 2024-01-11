@@ -17,7 +17,6 @@ const HomePage = () => {
 
   const mapUsersProfiles = (users: any) => {
     let tmp = JSON.parse(JSON.stringify(users));
-
     return tmp.map((user: any) => {
       return {
         adress: user[0],
