@@ -16,13 +16,12 @@ const HomePage = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   const mapUsersProfiles = (users: any) => {
-    let tmp = JSON.parse(JSON.stringify(users));
-    return tmp.map((user: any) => {
+    return users.map((user: any) => {
       return {
         adress: user[0],
         lastName: user[1],
         firstname: user[2],
-        skills: user[3],
+        skills: user[3].map((skill: any) => skill[0]),
       };
     });
   };
